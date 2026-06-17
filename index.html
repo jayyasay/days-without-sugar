@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Days Without Sugar</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      background: #f7f4ef;
+      color: #1f1f1f;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .tracker {
+      width: 100%;
+      max-width: 560px;
+      /* background: #ffffff; */
+      border-radius: 28px;
+      padding: 52px 28px;
+      /* box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08); */
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 28px;
+    }
+
+    .counter {
+      font-size: clamp(56px, 13vw, 110px);
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -3px;
+      margin-bottom: 28px;
+    }
+
+    .message {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #777;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 480px) {
+      .tracker {
+        padding: 42px 22px;
+      }
+
+      .title {
+        font-size: 21px;
+      }
+
+      .counter {
+        font-size: clamp(46px, 16vw, 72px);
+        letter-spacing: -2px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="tracker">
+    <h1 class="title">Days Without Sugar 🍩🚫</h1>
+
+    <div class="counter" id="durationDisplay">0 Days</div>
+
+    <p class="message">
+      One day at a time. Your future self will thank you.
+    </p>
+  </main>
+
+  <script>
+    const today = new Date();
+
+    const startDate = new Date(today.getFullYear(), 5, 11);
+
+    startDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const totalDays = Math.max(0, Math.floor((today - startDate) / msPerDay));
+
+    const durationDisplay = document.getElementById("durationDisplay");
+
+    function plural(value, label) {
+      return value === 1 ? label : label + "s";
+    }
+
+    function getCalendarDifference(start, end) {
+      let years = end.getFullYear() - start.getFullYear();
+      let months = end.getMonth() - start.getMonth();
+      let days = end.getDate() - start.getDate();
+
+      if (days < 0) {
+        months--;
+        const previousMonth = new Date(end.getFullYear(), end.getMonth(), 0);
+        days += previousMonth.getDate();
+      }
+
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      return {
+        years,
+        months,
+        days
+      };
+    }
+
+    function formatDuration() {
+      if (totalDays < 7) {
+        return totalDays + " " + plural(totalDays, "Day");
+      }
+
+      if (totalDays < 30) {
+        if (totalDays % 7 === 0) {
+          const weeks = totalDays / 7;
+          return weeks + " " + plural(weeks, "Week");
+        }
+
+        return totalDays + " " + plural(totalDays, "Day");
+      }
+
+      const diff = getCalendarDifference(startDate, today);
+      const parts = [];
+
+      if (diff.years > 0) {
+        parts.push(diff.years + " " + plural(diff.years, "Year"));
+      }
+
+      if (diff.months > 0) {
+        parts.push(diff.months + " " + plural(diff.months, "Month"));
+      }
+
+      if (diff.days > 0) {
+        if (diff.days % 7 === 0) {
+          const weeks = diff.days / 7;
+          parts.push(weeks + " " + plural(weeks, "Week"));
+        } else {
+          parts.push(diff.days + " " + plural(diff.days, "Day"));
+        }
+      }
+
+      if (parts.length === 0) {
+        return totalDays + " " + plural(totalDays, "Day");
+      }
+
+      return parts.join(", ");
+    }
+
+    durationDisplay.textContent = formatDuration();
+  </script>
+</body>
+</html>
